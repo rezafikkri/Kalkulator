@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Kalkulator</title>
+
+	<!-- required meta tag -->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width initial-scale=1">
+
+	<!-- load nomalisasi css -->
+	<link rel="stylesheet" type="text/css" href="normalize.css">
+
+	<!-- load css -->
+	<link rel="stylesheet" type="text/css" href="kalkulator.css">
+
+	<!-- icon -->
+	<link rel="icon" href="favicon.ico">
+</head>
+<body>
+
+<div class="container">
+	<div class="kalkulator">
+		<div class="kalkulator__hasil">
+			<input type="text" name="input" placeholder="...">
+			<span class="hasil">...</span>
+		</div>
+		<hr>
+		<div class="kalkulator__input">
+			<div><a href="#" class="btnInput">7</a></div>
+			<div><a href="#" class="btnInput">8</a></div>
+			<div><a href="#" class="btnInput">9</a></div>
+			<div><a href="#" class="btnInput">4</a></div>
+			<div><a href="#" class="btnInput">5</a></div>
+			<div><a href="#" class="btnInput">6</a></div>
+			<div><a href="#" class="btnInput">1</a></div>
+			<div><a href="#" class="btnInput">2</a></div>
+			<div><a href="#" class="btnInput">3</a></div>
+			<div><a href="#" class="btnInput">0</a></div>
+			<div><a href="#" class="btnInput">.</a></div>
+			<div><a href="#" class="btnInput">+</a></div>
+			<div><a href="#" class="btnInput">-</a></div>
+			<div><a href="#" class="btnInput">*</a></div>
+			<div><a href="#" class="btnInput">/</a></div>
+			<div><a href="#" class="samaDengan">=</a></div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+
+// handle ketika buttons character diklik (kecuali character sama dengan)
+const kalkulatorInput = document.querySelector("div.kalkulator__input");
+const input = document.querySelector('input[name="input"]');
+kalkulatorInput.addEventListener('click', (e)=> {
+	e.preventDefault();
+
+	const targetBtnInput = e.target;
+	if(targetBtnInput.classList.contains('btnInput')) {
+		const valInput = input.value.replace(' ','').replace(/[a-z]/i, '');
+		const valFromBtnInput = targetBtnInput.textContent;
+
+		// tambahkan value yang didapat ke form input
+		input.value = valInput+valFromBtnInput;
+	}
+});
+
+// handle ketika user menginputkan langsung di form input
+input.addEventListener('input', () => {
+	const valInput = input.value.replace(' ','');
+
+	// tambahkan value yang didapat dan telah difilter ke form input
+	input.value = valInput;
+});
+
+function cekOperatorPerkalian(valInput) {
+	for(const char of valInput) {
+		if(char === '*') return true;
+	}
+}
+
+function operasiPerkalian() {
+	console.log(valInput);
+}
+
+const samaDengan = document.querySelector("a.samaDengan");
+samaDengan.addEventListener('click', (e) => {
+	e.preventDefault();
+
+	let valInput = input.value.split('');
+	
+	/*** Operasi Perkalian ***
+		- Ide nya adalah, cari operator perkalian menggunakan for lalu ambil operator perkalian yang pertama kali ditemukan(sebagai operatorPerkalianPusat),
+
+		- Setelah itu cari bilangan sebelum operatorPerkalianPusat (menggunakan looping) dan tambahkan ke variabel dataperkalian tanpa membuat array baru,
+
+		- kemudian cari bilangan sesudah operatorPerkalianPusat (menggunakan looping) yang masih termasuk dalam operasi perkalian dengan kondisi, 
+
+			Jika looping adalah looping pertama maka tambahkan bilangan sebagai array baru pada variabel dataPerkalian, Jika looping bukan looping pertama maka tambahkan bilangan pada array terakhir dan tidak sebagai array baru, dan jika ditemukan charater ke-i dalam looping adalah operator perkalian, maka buat array baru yang isinya kosong pada variabel dataPerkalian,
+
+		- selanjutnya lakukan operasi perkalian menggunakan looping.
+		- ulangi langkah diatas untuk mengecek jika ada area operasi perkalian lain yang di pisahkan oleh operator selain operator perkalian.
+	***/
+
+	// jika benar ada operator perkalian dalam valInput	
+	if(cekOperatorPerkalian(valInput) === true) {
+		const posOperator = valInput.indexOf('*');
+		let dataPerkalian = [];
+		let hasilPerkalian;
+
+		/* tangkap area operasi perkalian-nya, dengan mendeteksi index awal(didapat ketika mencari bil1) dan jmlReplace (didapat ketika mencari bil2), supaya area tersebut bisa di replace dengan hasil perkalian */
+		let indexAwal;
+		let jmlReplace = 0;
+
+		// cari dataPerkalian yang terdapat sebelum operatorPerkalianPusat
+		for(let i = posOperator-1; i >= 0; i--) {
+			// jika valInput ke-i adalah number atau valInput ke-i adalah titik (ini untuk bilangan decimal)
+			if(parseInt(valInput[i]).toString() !== 'NaN' || valInput[i] === '.') {
+				// jika data perkalian belum ada
+				if(dataPerkalian.length === 0) {
+					dataPerkalian[0] = valInput[i];
+				} else {
+					dataPerkalian[0] = valInput[i]+dataPerkalian[0];
+				}
+
+				jmlReplace++;
+			} else {
+				indexAwal = i+1;
+				break;
+			}
+		}
+
+		// cari data perkalian yang terdapat mulai dari dan sesudah operatorPerkalianPusat (mengapa mulai dari operatorPerkalian pusat? karena supaya jmlReplace sesuai dengan dengan area operasi perkalian)
+		for(let i = posOperator; i <= valInput.length; i++) {
+			// jika valInput ke-i adalah number atau valInput ke-i adalah titik (ini untuk bilangan decimal)
+			if(parseInt(valInput[i]).toString() !== 'NaN' || valInput[i] === '.') {
+
+				// jika dataPerkalian.length = 1 (artinya ini adalah looping pertama setelah (cari dataPerkalian yang terdapat sebelum operator perkalian))
+				if(dataPerkalian.length === 1) {
+					dataPerkalian.push(valInput[i]);
+				} else {
+					dataPerkalian[dataPerkalian.length-1] = dataPerkalian[dataPerkalian.length-1]+valInput[i];
+				}
+
+				jmlReplace++;
+			}
+			// jika valInput ke-i adalah operator perkalian
+			else if(valInput[i] === '*') {
+				dataPerkalian.push('');
+
+				jmlReplace++;
+			} else {
+				break;
+			}
+		}
+
+		// hitung operasi perkalian
+		for(let i = 0; i < dataPerkalian.length; i++) {
+			if(i == 0) {
+				hasilPerkalian = parseFloat(dataPerkalian[i]);
+			} else {
+				hasilPerkalian *= parseFloat(dataPerkalian[i]);
+			}
+		}
+
+		valInput.splice(indexAwal, jmlReplace, hasilPerkalian.toString());
+
+		console.log(valInput);
+	}
+});
+
+</script>
+
+</body>
+</html>
