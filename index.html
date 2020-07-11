@@ -42,6 +42,7 @@
 			<div><a href="#" class="btnInput">*</a></div>
 			<div><a href="#" class="btnInput">/</a></div>
 			<div><a href="#" class="samaDengan">=</a></div>
+			<div><a href="#" class="hapus"><-</a></div>
 		</div>
 	</div>
 </div>
@@ -50,76 +51,87 @@
 
 // handle ketika buttons character diklik (kecuali character sama dengan)
 const kalkulatorInput = document.querySelector("div.kalkulator__input");
-const input = document.querySelector('input[name="input"]');
+const inputDataOperasiMM = document.querySelector('input[name="input"]');
+const formHasilOperasiMM = document.querySelector('span.hasil');
 kalkulatorInput.addEventListener('click', (e)=> {
 	e.preventDefault();
 
 	const targetBtnInput = e.target;
 	if(targetBtnInput.classList.contains('btnInput')) {
-		const valInput = input.value.replace(' ','').replace(/[a-z]/i, '');
+		const dataOperasiMM = inputDataOperasiMM.value.replace(' ','').replace(/[a-z]/i, '');
 		const valFromBtnInput = targetBtnInput.textContent;
 
 		// tambahkan value yang didapat ke form input
-		input.value = valInput+valFromBtnInput;
+		inputDataOperasiMM.value = dataOperasiMM+valFromBtnInput;
 	}
 });
 
 // handle ketika user menginputkan langsung di form input
-input.addEventListener('input', () => {
-	const valInput = input.value.replace(' ','');
+inputDataOperasiMM.addEventListener('input', () => {
+	const dataOperasiMM = inputDataOperasiMM.value.replace(' ','');
 
 	// tambahkan value yang didapat dan telah difilter ke form input
-	input.value = valInput;
+	inputDataOperasiMM.value = dataOperasiMM;
 });
 
-function cekOperatorPerkalian(valInput) {
-	for(const char of valInput) {
-		if(char === '*') return true;
+function easyOperasiMM(arrDataOperasiMM, operatorMM) {
+	let hasilOperasiSpesifik;
+	// looping arrDataOperasiMM dan (kalikan) setiap bilangan
+	for(let i = 0; i < arrDataOperasiMM.length; i++) {
+		if(i === 0 && arrDataOperasiMM[i] !== operatorMM) {
+			hasilOperasiSpesifik = parseFloat(arrDataOperasiMM[i]);
+		} else if(arrDataOperasiMM[i] !== operatorMM) {
+			// jika operatorMM adalah perkalian
+			if(operatorMM === '*') hasilOperasiSpesifik *= parseFloat(arrDataOperasiMM[i]);
+			// jika operatorMM adalah pembagian
+			if(operatorMM === '/') hasilOperasiSpesifik /= parseFloat(arrDataOperasiMM[i]);
+			// jika operatorMM adalah penambahan
+			if(operatorMM === '+') hasilOperasiSpesifik += parseFloat(arrDataOperasiMM[i]);
+			// jika operatorMM adalah pengurangan
+			if(operatorMM === '-') hasilOperasiSpesifik -= parseFloat(arrDataOperasiMM[i]);
+		}
 	}
+	return hasilOperasiSpesifik;
 }
 
-function operasiPerkalian() {
-	console.log(valInput);
-}
+function advancedOperasiMM(arrDataOperasiMM, operatorMM) {
+	/** Algoritma Advanced Operasi Matematika **
 
-const samaDengan = document.querySelector("a.samaDengan");
-samaDengan.addEventListener('click', (e) => {
-	e.preventDefault();
+		Note: Kita asumsikan bahwa operatorMM ada perkalian
 
-	let valInput = input.value.split('');
-	
-	/*** Operasi Perkalian ***
-		- Ide nya adalah, cari operator perkalian menggunakan for lalu ambil operator perkalian yang pertama kali ditemukan(sebagai operatorPerkalianPusat),
+		- Cari operator perkalian didalam arrDataOperasiMM menggunakan for lalu ambil operator perkalian yang pertama kali ditemukan(sebagai operatorPerkalianPusat),
 
-		- Setelah itu cari bilangan sebelum operatorPerkalianPusat (menggunakan looping) dan tambahkan ke variabel dataperkalian tanpa membuat array baru,
+		- Setelah itu cari bilangan sebelum operatorPerkalianPusat (menggunakan looping) dan tambahkan ke variabel dataOperasiSpesifik tanpa membuat array baru,
 
 		- kemudian cari bilangan sesudah operatorPerkalianPusat (menggunakan looping) yang masih termasuk dalam operasi perkalian dengan kondisi, 
 
-			Jika looping adalah looping pertama maka tambahkan bilangan sebagai array baru pada variabel dataPerkalian, Jika looping bukan looping pertama maka tambahkan bilangan pada array terakhir dan tidak sebagai array baru, dan jika ditemukan charater ke-i dalam looping adalah operator perkalian, maka buat array baru yang isinya kosong pada variabel dataPerkalian,
+			Jika looping adalah looping pertama maka tambahkan bilangan sebagai array baru pada variabel dataOperasiSpesifik, Jika looping bukan looping pertama maka tambahkan bilangan pada array terakhir dan tidak sebagai array baru, dan jika ditemukan charater ke-i dalam looping adalah operator perkalian, maka buat array baru yang isinya kosong pada variabel dataOperasiSpesifik,
 
 		- selanjutnya lakukan operasi perkalian menggunakan looping.
-		- ulangi langkah diatas untuk mengecek jika ada area operasi perkalian lain yang di pisahkan oleh operator selain operator perkalian.
-	***/
+		- ulangi langkah diatas untuk mengecek jika ada area operasi perkalian lain yang di pisahkan oleh operator selain operator perkalian menggunakan function rekursif.
+	*/
 
-	// jika benar ada operator perkalian dalam valInput	
-	if(cekOperatorPerkalian(valInput) === true) {
-		const posOperator = valInput.indexOf('*');
-		let dataPerkalian = [];
-		let hasilPerkalian;
+	const arrDataOperasiMMSementara = arrDataOperasiMM;
+	const posOperator = arrDataOperasiMMSementara.indexOf(operatorMM);
 
-		/* tangkap area operasi perkalian-nya, dengan mendeteksi index awal(didapat ketika mencari bil1) dan jmlReplace (didapat ketika mencari bil2), supaya area tersebut bisa di replace dengan hasil perkalian */
+	// jika masih ada operator (perkalian) dalam arrDataOperasiMMSementara (sebagai penentu hentikan function rekursif atau tetap jalankan function rekursif)
+	if(posOperator !== -1) {
+		let dataOperasiSpesifik = [];
+		let hasilOperasiSpesifik;
+
+		/* tangkap area operasi (perkalian)-nya, dengan mendeteksi index awal(didapat ketika mencari bil1) dan jmlReplace (didapat ketika mencari bil2), supaya area tersebut bisa di replace dengan hasil (perkalian) */
 		let indexAwal;
 		let jmlReplace = 0;
 
-		// cari dataPerkalian yang terdapat sebelum operatorPerkalianPusat
+		// cari dataOperasiSpesifik yang terdapat sebelum operatorPerkalianPusat
 		for(let i = posOperator-1; i >= 0; i--) {
-			// jika valInput ke-i adalah number atau valInput ke-i adalah titik (ini untuk bilangan decimal)
-			if(parseInt(valInput[i]).toString() !== 'NaN' || valInput[i] === '.') {
-				// jika data perkalian belum ada
-				if(dataPerkalian.length === 0) {
-					dataPerkalian[0] = valInput[i];
+			// jika arrDataOperasiMMSementara ke-i adalah number atau arrDataOperasiMMSementara ke-i adalah titik (ini untuk bilangan decimal)
+			if(parseInt(arrDataOperasiMMSementara[i]).toString() !== 'NaN' || arrDataOperasiMMSementara[i] === '.') {
+				// jika data (perkalian) belum ada
+				if(dataOperasiSpesifik.length === 0) {
+					dataOperasiSpesifik[0] = arrDataOperasiMMSementara[i];
 				} else {
-					dataPerkalian[0] = valInput[i]+dataPerkalian[0];
+					dataOperasiSpesifik[0] = arrDataOperasiMMSementara[i]+dataOperasiSpesifik[0];
 				}
 
 				jmlReplace++;
@@ -129,23 +141,23 @@ samaDengan.addEventListener('click', (e) => {
 			}
 		}
 
-		// cari data perkalian yang terdapat mulai dari dan sesudah operatorPerkalianPusat (mengapa mulai dari operatorPerkalian pusat? karena supaya jmlReplace sesuai dengan dengan area operasi perkalian)
-		for(let i = posOperator; i <= valInput.length; i++) {
-			// jika valInput ke-i adalah number atau valInput ke-i adalah titik (ini untuk bilangan decimal)
-			if(parseInt(valInput[i]).toString() !== 'NaN' || valInput[i] === '.') {
+		// cari data (perkalian) yang terdapat mulai dari dan sesudah operatorPerkalianPusat (mengapa mulai dari operatorPerkalian pusat? karena supaya jmlReplace sesuai dengan dengan area operasi perkaliannya)
+		for(let i = posOperator; i < arrDataOperasiMMSementara.length; i++) {
+			// jika arrDataOperasiMMSementara ke-i adalah number atau arrDataOperasiMMSementara ke-i adalah titik (ini untuk bilangan decimal)
+			if(parseInt(arrDataOperasiMMSementara[i]).toString() !== 'NaN' || arrDataOperasiMMSementara[i] === '.') {
 
-				// jika dataPerkalian.length = 1 (artinya ini adalah looping pertama setelah (cari dataPerkalian yang terdapat sebelum operator perkalian))
-				if(dataPerkalian.length === 1) {
-					dataPerkalian.push(valInput[i]);
+				// jika dataOperasiSpesifik.length = 1 (artinya ini adalah looping pertama setelah (cari dataOperasiSpesifik yang terdapat sebelum operator (perkalian)))
+				if(dataOperasiSpesifik.length === 1) {
+					dataOperasiSpesifik.push(arrDataOperasiMMSementara[i]);
 				} else {
-					dataPerkalian[dataPerkalian.length-1] = dataPerkalian[dataPerkalian.length-1]+valInput[i];
+					dataOperasiSpesifik[dataOperasiSpesifik.length-1] = dataOperasiSpesifik[dataOperasiSpesifik.length-1]+arrDataOperasiMMSementara[i];
 				}
 
 				jmlReplace++;
 			}
-			// jika valInput ke-i adalah operator perkalian
-			else if(valInput[i] === '*') {
-				dataPerkalian.push('');
+			// jika arrDataOperasiMMSementara ke-i adalah operator (perkalian)
+			else if(arrDataOperasiMMSementara[i] === operatorMM) {
+				dataOperasiSpesifik.push('');
 
 				jmlReplace++;
 			} else {
@@ -153,19 +165,101 @@ samaDengan.addEventListener('click', (e) => {
 			}
 		}
 
-		// hitung operasi perkalian
-		for(let i = 0; i < dataPerkalian.length; i++) {
+		// hitung operasi (perkalian)
+		for(let i = 0; i < dataOperasiSpesifik.length; i++) {
 			if(i == 0) {
-				hasilPerkalian = parseFloat(dataPerkalian[i]);
+				hasilOperasiSpesifik = parseFloat(dataOperasiSpesifik[i]);
 			} else {
-				hasilPerkalian *= parseFloat(dataPerkalian[i]);
+				// jika operatorMM adalah perkalian
+				if(operatorMM === '*') hasilOperasiSpesifik *= parseFloat(dataOperasiSpesifik[i]);
+				// jika operatorMM adalah pembagian
+				if(operatorMM === '/') hasilOperasiSpesifik /= parseFloat(dataOperasiSpesifik[i]);
+				// jika operatorMM adalah penambahan
+				if(operatorMM === '+') hasilOperasiSpesifik += parseFloat(dataOperasiSpesifik[i]);
+				// jika operatorMM adalah pengurangan
+				if(operatorMM === '-') hasilOperasiSpesifik -= parseFloat(dataOperasiSpesifik[i]);
 			}
 		}
 
-		valInput.splice(indexAwal, jmlReplace, hasilPerkalian.toString());
+		arrDataOperasiMMSementara.splice(indexAwal, jmlReplace, hasilOperasiSpesifik.toString());
 
-		console.log(valInput);
+		console.log(arrDataOperasiMMSementara);
+
+		// panggil lagi fungsi advancedOperasiMM (function rekursif)
+		return advancedOperasiMM(arrDataOperasiMMSementara, operatorMM);
+	} else {
+		// hentikan function rekursif
+		return arrDataOperasiMMSementara.join('');
 	}
+}
+
+function cekOperatorMatematika(arrOperatorMM, arrDataOperasiMM) {
+	for(let i = 0; i < arrOperatorMM.length; i++) {
+		// cek setiap operator dalam arrOperatorMM ada didalam array data operasi matematika
+		for(let j=0; j < arrDataOperasiMM.length; j++) {
+			if(arrOperatorMM[i] === arrDataOperasiMM[j]) return true;
+		}
+	}
+	return false;
+}
+
+// handle ketika user klik button sama dengan
+const samaDengan = document.querySelector("a.samaDengan");
+samaDengan.addEventListener('click', (e) => {
+	e.preventDefault();
+
+	// jika format inputDataOperasiMM salah, maka tampilkan error
+	if(!/^[0-9]/.test(inputDataOperasiMM.value) || !/[0-9]$/.test(inputDataOperasiMM.value)) {
+		alert('Format Operasi Matematika salah.');
+		return 0;
+	}
+
+	let dataOperasiMM = inputDataOperasiMM.value;
+
+	/** OPERASI PERKALIAN **/
+	// jika benar ada operator perkalian dan cek apakah operasi matematika yang dimasukkan hanya perkalian atau tidak, jika ya, maka jalankan advancedOperasiMM
+	if(dataOperasiMM.split('').indexOf('*') && cekOperatorMatematika(['+','/','-'], dataOperasiMM.split(''))) {
+		dataOperasiMM = advancedOperasiMM(dataOperasiMM.split(''), '*');
+	} 
+	// jika tidak, maka jalankan easyOperasiMM
+	else {
+		formHasilOperasiMM.innerText = easyOperasiMM(dataOperasiMM.split('*'), '*');
+		return 0;
+	}
+
+	/** OPERASI PEMBAGIAN **/
+	if(dataOperasiMM.split('').indexOf('/') && cekOperatorMatematika(['*','+','-'], dataOperasiMM.split(''))) {
+		dataOperasiMM = advancedOperasiMM(dataOperasiMM.split(''), '/');
+	} else {
+		formHasilOperasiMM.innerText = easyOperasiMM(dataOperasiMM.split('/'), '/');
+		return 0;
+	}
+
+	/** OPERASI PENAMBAHAN **/
+	if(dataOperasiMM.split('').indexOf('+') && cekOperatorMatematika(['*','/','-'], dataOperasiMM.split(''))) {
+		dataOperasiMM = advancedOperasiMM(dataOperasiMM.split(''), '+');
+	} else {
+		formHasilOperasiMM.innerText = easyOperasiMM(dataOperasiMM.split('+'), '+');
+		return 0;
+	}
+
+	/** OPERASI PENGURANGAN **/
+	if(dataOperasiMM.split('').indexOf('-') && cekOperatorMatematika(['*','/','+'], dataOperasiMM.split(''))) {
+		dataOperasiMM = advancedOperasiMM(dataOperasiMM.split(''), '-');
+	} else {
+		formHasilOperasiMM.innerText = easyOperasiMM(dataOperasiMM.split('-'), '-');
+		return 0;
+	}
+});
+
+// handle ketika user klik button hapus
+const hapus = document.querySelector("a.hapus");
+hapus.addEventListener('click', (e) => {
+	e.preventDefault();
+
+	const dataOperasiMM = inputDataOperasiMM.value.split('');
+	dataOperasiMM.pop();
+	inputDataOperasiMM.value = dataOperasiMM.join('');
 });
 
 </script>

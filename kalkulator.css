@@ -47,7 +47,9 @@ hr {
 }
 
 .kalkulator__hasil span {
-	flex-basis: 80px;
+	overflow: hidden;
+	overflow-x: auto;
+	flex-basis: 130px;
 }
 
 .kalkulator__input {
