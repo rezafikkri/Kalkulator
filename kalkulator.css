@@ -4,6 +4,7 @@
 
 body {
 	background-color: #f2f2f2;
+	font-family: sans-serif;
 }
 
 hr {
@@ -44,6 +45,7 @@ hr {
 	width: 0%;
 	flex-grow: 1;
 	margin-right: 10px;
+	outline: none;
 }
 
 .kalkulator__hasil span {
