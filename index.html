@@ -183,8 +183,6 @@ function advancedOperasiMM(arrDataOperasiMM, operatorMM) {
 
 		arrDataOperasiMMSementara.splice(indexAwal, jmlReplace, hasilOperasiSpesifik.toString());
 
-		console.log(arrDataOperasiMMSementara);
-
 		// panggil lagi fungsi advancedOperasiMM (function rekursif)
 		return advancedOperasiMM(arrDataOperasiMMSementara, operatorMM);
 	} else {
