@@ -1,5 +1,7 @@
 # KALKULATOR<br>![version](https://img.shields.io/badge/version-1.0-blue)
 
+[**Demo Kalkulator**](https://rezafikkri.github.io/Kalkulator/)
+
 Teknologi Yang digunakan
 - Javascript
 - CSS
