@@ -94,7 +94,7 @@ function easyOperasiMM(arrDataOperasiMM, operatorMM) {
 	return hasilOperasiSpesifik;
 }
 
-function advancedOperasiMM(arrDataOperasiMM, operatorMM) {
+function advancedOperasiMM(arrDataOperasiMM, operatorMM, posOperator) {
 	/** Algoritma Advanced Operasi Matematika **
 
 		Note: Kita asumsikan bahwa operatorMM ada perkalian
@@ -111,10 +111,7 @@ function advancedOperasiMM(arrDataOperasiMM, operatorMM) {
 		- ulangi langkah diatas untuk mengecek jika ada area operasi perkalian lain yang di pisahkan oleh operator selain operator perkalian menggunakan function rekursif.
 	*/
 
-	const arrDataOperasiMMSementara = arrDataOperasiMM;
-	const posOperator = arrDataOperasiMMSementara.indexOf(operatorMM);
-
-	// jika masih ada operator (perkalian) dalam arrDataOperasiMMSementara (sebagai penentu hentikan function rekursif atau tetap jalankan function rekursif)
+	// jika masih ada operator (perkalian) dalam arrDataOperasiMM (sebagai penentu hentikan function rekursif atau tetap jalankan function rekursif)
 	if(posOperator !== -1) {
 		let dataOperasiSpesifik = [];
 		let hasilOperasiSpesifik;
@@ -125,13 +122,13 @@ function advancedOperasiMM(arrDataOperasiMM, operatorMM) {
 
 		// cari dataOperasiSpesifik yang terdapat sebelum operatorPerkalianPusat
 		for(let i = posOperator-1; i >= 0; i--) {
-			// jika arrDataOperasiMMSementara ke-i adalah number atau arrDataOperasiMMSementara ke-i adalah titik (ini untuk bilangan decimal)
-			if(parseInt(arrDataOperasiMMSementara[i]).toString() !== 'NaN' || arrDataOperasiMMSementara[i] === '.') {
+			// jika arrDataOperasiMM ke-i adalah number atau arrDataOperasiMM ke-i adalah titik (ini untuk bilangan decimal)
+			if(parseInt(arrDataOperasiMM[i]).toString() !== 'NaN' || arrDataOperasiMM[i] === '.') {
 				// jika data (perkalian) belum ada
 				if(dataOperasiSpesifik.length === 0) {
-					dataOperasiSpesifik[0] = arrDataOperasiMMSementara[i];
+					dataOperasiSpesifik[0] = arrDataOperasiMM[i];
 				} else {
-					dataOperasiSpesifik[0] = arrDataOperasiMMSementara[i]+dataOperasiSpesifik[0];
+					dataOperasiSpesifik[0] = arrDataOperasiMM[i]+dataOperasiSpesifik[0];
 				}
 
 				jmlReplace++;
@@ -142,21 +139,21 @@ function advancedOperasiMM(arrDataOperasiMM, operatorMM) {
 		}
 
 		// cari data (perkalian) yang terdapat mulai dari dan sesudah operatorPerkalianPusat (mengapa mulai dari operatorPerkalian pusat? karena supaya jmlReplace sesuai dengan dengan area operasi perkaliannya)
-		for(let i = posOperator; i < arrDataOperasiMMSementara.length; i++) {
-			// jika arrDataOperasiMMSementara ke-i adalah number atau arrDataOperasiMMSementara ke-i adalah titik (ini untuk bilangan decimal)
-			if(parseInt(arrDataOperasiMMSementara[i]).toString() !== 'NaN' || arrDataOperasiMMSementara[i] === '.') {
+		for(let i = posOperator; i < arrDataOperasiMM.length; i++) {
+			// jika arrDataOperasiMM ke-i adalah number atau arrDataOperasiMM ke-i adalah titik (ini untuk bilangan decimal)
+			if(parseInt(arrDataOperasiMM[i]).toString() !== 'NaN' || arrDataOperasiMM[i] === '.') {
 
 				// jika dataOperasiSpesifik.length = 1 (artinya ini adalah looping pertama setelah (cari dataOperasiSpesifik yang terdapat sebelum operator (perkalian)))
 				if(dataOperasiSpesifik.length === 1) {
-					dataOperasiSpesifik.push(arrDataOperasiMMSementara[i]);
+					dataOperasiSpesifik.push(arrDataOperasiMM[i]);
 				} else {
-					dataOperasiSpesifik[dataOperasiSpesifik.length-1] = dataOperasiSpesifik[dataOperasiSpesifik.length-1]+arrDataOperasiMMSementara[i];
+					dataOperasiSpesifik[dataOperasiSpesifik.length-1] = dataOperasiSpesifik[dataOperasiSpesifik.length-1]+arrDataOperasiMM[i];
 				}
 
 				jmlReplace++;
 			}
-			// jika arrDataOperasiMMSementara ke-i adalah operator (perkalian)
-			else if(arrDataOperasiMMSementara[i] === operatorMM) {
+			// jika arrDataOperasiMM ke-i adalah operator (perkalian)
+			else if(arrDataOperasiMM[i] === operatorMM) {
 				dataOperasiSpesifik.push('');
 
 				jmlReplace++;
@@ -181,13 +178,14 @@ function advancedOperasiMM(arrDataOperasiMM, operatorMM) {
 			}
 		}
 
-		arrDataOperasiMMSementara.splice(indexAwal, jmlReplace, hasilOperasiSpesifik.toString());
-
+		// replace arrDataOperasiMM dengan hasilOperasiSpesifik
+		arrDataOperasiMM.splice(indexAwal, jmlReplace, hasilOperasiSpesifik.toString());
+		
 		// panggil lagi fungsi advancedOperasiMM (function rekursif)
-		return advancedOperasiMM(arrDataOperasiMMSementara, operatorMM);
+		return advancedOperasiMM(arrDataOperasiMM, operatorMM, arrDataOperasiMM.indexOf(operatorMM));
 	} else {
 		// hentikan function rekursif
-		return arrDataOperasiMMSementara.join('');
+		return arrDataOperasiMM.join('');
 	}
 }
 
@@ -217,7 +215,7 @@ samaDengan.addEventListener('click', (e) => {
 	/** OPERASI PERKALIAN **/
 	// jika benar ada operator perkalian dan cek apakah operasi matematika yang dimasukkan hanya perkalian atau tidak, jika ya, maka jalankan advancedOperasiMM
 	if(dataOperasiMM.split('').indexOf('*') && cekOperatorMatematika(['+','/','-'], dataOperasiMM.split(''))) {
-		dataOperasiMM = advancedOperasiMM(dataOperasiMM.split(''), '*');
+		dataOperasiMM = advancedOperasiMM(dataOperasiMM.split(''), '*', dataOperasiMM.indexOf('*'));
 	} 
 	// jika tidak, maka jalankan easyOperasiMM
 	else {
@@ -227,7 +225,7 @@ samaDengan.addEventListener('click', (e) => {
 
 	/** OPERASI PEMBAGIAN **/
 	if(dataOperasiMM.split('').indexOf('/') && cekOperatorMatematika(['*','+','-'], dataOperasiMM.split(''))) {
-		dataOperasiMM = advancedOperasiMM(dataOperasiMM.split(''), '/');
+		dataOperasiMM = advancedOperasiMM(dataOperasiMM.split(''), '/', dataOperasiMM.indexOf('/'));
 	} else {
 		formHasilOperasiMM.innerText = easyOperasiMM(dataOperasiMM.split('/'), '/');
 		return 0;
@@ -235,7 +233,7 @@ samaDengan.addEventListener('click', (e) => {
 
 	/** OPERASI PENAMBAHAN **/
 	if(dataOperasiMM.split('').indexOf('+') && cekOperatorMatematika(['*','/','-'], dataOperasiMM.split(''))) {
-		dataOperasiMM = advancedOperasiMM(dataOperasiMM.split(''), '+');
+		dataOperasiMM = advancedOperasiMM(dataOperasiMM.split(''), '+', dataOperasiMM.indexOf('+'));
 	} else {
 		formHasilOperasiMM.innerText = easyOperasiMM(dataOperasiMM.split('+'), '+');
 		return 0;
@@ -243,7 +241,7 @@ samaDengan.addEventListener('click', (e) => {
 
 	/** OPERASI PENGURANGAN **/
 	if(dataOperasiMM.split('').indexOf('-') && cekOperatorMatematika(['*','/','+'], dataOperasiMM.split(''))) {
-		dataOperasiMM = advancedOperasiMM(dataOperasiMM.split(''), '-');
+		dataOperasiMM = advancedOperasiMM(dataOperasiMM.split(''), '-', dataOperasiMM.indexOf('-'));
 	} else {
 		formHasilOperasiMM.innerText = easyOperasiMM(dataOperasiMM.split('-'), '-');
 		return 0;
